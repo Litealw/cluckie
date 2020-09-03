@@ -219,6 +219,36 @@ client.on("message", async message => {
         message.channel.send(`${message.author}, yes `)
     };
 
+    if(command === "ask") {
+        const quest = args.join(" ");
+
+        const ans = [
+            "Yes",
+            "No",
+            "Probably",
+            "Probably not",
+            "Maybe",
+            "Ask again",
+            "Interesting",
+            "lol",
+            "It's decided so",
+            "Of course",
+            "I forgot",
+            "I'm dumb",
+            "Totally",
+            "Totally not",
+            "NO",
+            "YES"
+        ]
+
+        const askemb = new Discord.MessageEmbed()
+        .setAuthor(quest)
+        .setTitle('Answer')
+        .setDescription(ans[Math.floor(Math.random() * ans.length)])
+        .setFooter(`${message.author.tag}`);
+        message.channel.send(askemb);
+    };
+
 
 });
 
