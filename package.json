@@ -1,0 +1,26 @@
+{
+  "name": "cluckbot",
+  "version": "1.0.0",
+  "description": "bot for a discord server cloudflare made by",
+  "main": "index.js",
+  "scripts": {
+    "test": "c.test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "notyet"
+  },
+  "keywords": [
+    "discord",
+    "bot"
+  ],
+  "author": "Cloudflare",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^12.3.1",
+    "fetch": "^1.1.0",
+    "fs": "0.0.1-security",
+    "node": "^14.8.0",
+    "path": "^0.12.7"
+  }
+}
