@@ -249,6 +249,25 @@ client.on("message", async message => {
         message.channel.send(askemb);
     };
 
+    if(command === "pp") {
+        const pans = [
+            "Big PP",
+            "Very Big PP",
+            "Small PP",
+            "Very Small PP"
+        ]
+
+        const ppemb = new Discord.MessageEmbed()
+        .setTitle('Cluckie')
+        .setDescription(`User has ${pans[Math.floor(Math.random() * pans.length)]}`);
+        message.channel.send(ppemb)
+    };
+
+    if(message.isMentioned('428437981238657025')) {
+        message.reply('ask cloudflare bot');
+    };
+
+
 
 });
 
