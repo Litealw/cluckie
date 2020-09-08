@@ -12,12 +12,15 @@ const Discord = require("discord.js");
 
 
 const nuds = "*"
+if (Number(process.version.slice(1).split(".")[0]) < 8) throw new Error("Node 8.0.0 or higher is required. Update Node on your system.");
 // This is your client. Some people call it `bot`, some people call it `self`, 
 // some might call it `cootchie`. Either way, when you see `client.something`, or `bot.something`,
 // this is what we're refering to. Your client.
 const client = new Discord.Client();
 const path = require("path");
 const fs = require("fs");
+const eco = require("discord-economy");
+
 // Here we load the config.json file that contains our token and our prefix values. 
 const config = require("./config.json");
 // config.token contains the bot's token
@@ -94,7 +97,7 @@ client.on("message", async message => {
 
     if(command === "help") {
         //test help cmd
-        message.channel.send(`not yet cloudflare is sleepy slop`)
+        message.channel.send(`[client Object]`)
         message.react('👀')
     };
 
@@ -198,10 +201,10 @@ client.on("message", async message => {
     if(command === 'avatar') {
         message.react('👀')
         if (args[0]) {
-            const auser = getUserFromMention(args[0]);
+            const auser = getUserFromMention(args[1]);
             
     
-            return message.channel.send(`${auser.username}'s avatar: ${auser.displayAvatarURL({ dynamic: true })}`);
+            return message.channel.send(`${auser.username}'s avatar: ${auser.displayAvatarURL}`);
         }
     
         return message.channel.send(`${message.author.username}, your avatar: ${message.author.displayAvatarURL({ dynamic: true })}`);
@@ -254,18 +257,108 @@ client.on("message", async message => {
             "Big PP",
             "Very Big PP",
             "Small PP",
-            "Very Small PP"
+            "Very Small PP",
+            "No PP",
+            "Depressed PP",
+            "Leaked PP",
+            "Unwanted PP"
         ]
 
         const ppemb = new Discord.MessageEmbed()
-        .setTitle('Cluckie')
-        .setDescription(`User has ${pans[Math.floor(Math.random() * pans.length)]}`);
-        message.channel.send(ppemb)
+        .setTitle('PP')
+        .setDescription(`${message.author} has ${pans[Math.floor(Math.random() * pans.length)]}`);
+        message.channel.send(ppemb);
     };
 
-    if(message.isMentioned('428437981238657025')) {
+    if(command === "iq") {
+        const iqrates = [
+            "0",
+            "-1000",
+            "♾",
+            "1",
+            "2",
+            "3",
+            "100000000000000000000000000000000000000000000000",
+            "200",
+            "300",
+            "400",
+            "500",
+            "600",
+            "700",
+            "800",
+            "900",
+            "1000",
+            "No",
+            "[ Content Deleted ]",
+            "Bobux",
+            "1B+"
+        ]
+        const iqemb = new Discord.MessageEmbed()
+        .setTitle('IQ')
+        .setDescription(`${message.author} has ${iqrates[Math.floor(Math.random() * iqrates.length)]}`);
+        message.channel.send(iqemb);
+    };
+
+    if(message.mentions.has()) {
         message.reply('ask cloudflare bot');
     };
+
+
+
+
+    //Eco system using discord-economy
+    if(command === "balance") {
+        var output = await eco.FetchBalance(message.author.id)
+        message.channel.send(`${message.author.tag}! You own ${output.balance} CCoins.`);
+    };
+
+    if (command === 'daily') {
+ 
+        var output = await eco.Daily(message.author.id)
+        //output.updated will tell you if the user already claimed his/her daily yes or no.
+     
+        if (output.updated) {
+     
+          var profile = await eco.AddToBalance(message.author.id, 1000)
+          message.reply(`You claimed your daily ccoins successfully! You now own ${profile.newbalance} CCoins.`);
+     
+        } else {
+          message.channel.send(`Sorry, you already claimed your daily ccoins!\nBut no worries, over ${output.timetowait} you can daily again!`)
+        }
+     
+    };
+
+    if (command === 'work') { //I made 2 examples for this command! Both versions will work!
+ 
+        var output = await eco.Work(message.author.id)
+        //50% chance to fail and earn nothing. You earn between 1-100 coins. And you get one out of 20 random jobs.
+        if (output.earned == 0) return message.reply('Awh, you did not do your job well so you earned nothing!')
+        message.channel.send(`${message.author.username}
+    You worked as a \` ${output.job} \` and earned :coin: ${output.earned} CCoins
+    You now own :coin: ${output.balance} CCoins`)
+     
+     
+        var output = await eco.Work(message.author.id, {
+          failurerate: 10,
+          money: Math.floor(Math.random() * 100),
+          jobs: ['cashier', 'shopkeeper', 'developer', 'bot developer', 'protestor', 'shitposter', 'pogger']
+        })
+        //10% chance to fail and earn nothing. You earn between 1-500 coins. And you get one of those 3 random jobs.
+        if (output.earned == 0) return message.reply('Awh, you did not do your job well so you earned nothing!')
+     
+        message.channel.send(`${message.author.username}
+    You worked as a \` ${output.job} \` and earned :coin: ${output.earned} CCoins
+    You now own :coin: ${output.balance} CCoins`)
+     
+    };
+
+    if(command === "shop") {
+        message.channel.send("Shop coming soon made by a cloud near you")
+    };
+
+
+
+
 
 
 
