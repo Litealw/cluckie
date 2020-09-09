@@ -19,7 +19,9 @@ if (Number(process.version.slice(1).split(".")[0]) < 8) throw new Error("Node 8.
 const client = new Discord.Client();
 const path = require("path");
 const fs = require("fs");
-const eco = require("discord-economy");
+//eco system
+const Eco = require("quick.eco");
+const eco = new Eco.Manager();
 
 // Here we load the config.json file that contains our token and our prefix values. 
 const config = require("./config.json");
@@ -306,58 +308,76 @@ client.on("message", async message => {
 
 
 
-    //Eco system using discord-economy
-    if(command === "balance") {
-        var output = await eco.FetchBalance(message.author.id)
-        message.channel.send(`${message.author.tag}! You own ${output.balance} CCoins.`);
-    };
-
-    if (command === 'daily') {
- 
-        var output = await eco.Daily(message.author.id)
-        //output.updated will tell you if the user already claimed his/her daily yes or no.
-     
-        if (output.updated) {
-     
-          var profile = await eco.AddToBalance(message.author.id, 1000)
-          message.reply(`You claimed your daily ccoins successfully! You now own ${profile.newbalance} CCoins.`);
-     
-        } else {
-          message.channel.send(`Sorry, you already claimed your daily ccoins!\nBut no worries, over ${output.timetowait} you can daily again!`)
-        }
-     
-    };
-
-    if (command === 'work') { //I made 2 examples for this command! Both versions will work!
- 
-        var output = await eco.Work(message.author.id)
-        //50% chance to fail and earn nothing. You earn between 1-100 coins. And you get one out of 20 random jobs.
-        if (output.earned == 0) return message.reply('Awh, you did not do your job well so you earned nothing!')
-        message.channel.send(`${message.author.username}
-    You worked as a \` ${output.job} \` and earned :coin: ${output.earned} CCoins
-    You now own :coin: ${output.balance} CCoins`)
-     
-     
-        var output = await eco.Work(message.author.id, {
-          failurerate: 10,
-          money: Math.floor(Math.random() * 100),
-          jobs: ['cashier', 'shopkeeper', 'developer', 'bot developer', 'protestor', 'shitposter', 'pogger']
-        })
-        //10% chance to fail and earn nothing. You earn between 1-500 coins. And you get one of those 3 random jobs.
-        if (output.earned == 0) return message.reply('Awh, you did not do your job well so you earned nothing!')
-     
-        message.channel.send(`${message.author.username}
-    You worked as a \` ${output.job} \` and earned :coin: ${output.earned} CCoins
-    You now own :coin: ${output.balance} CCoins`)
-     
-    };
+    //Eco system using Shit
+    
 
     if(command === "shop") {
         message.channel.send("Shop coming soon made by a cloud near you")
     };
 
+    if(command === "daily") {
+        let add = eco.daily(message.author.id, 500);
+        if (add.onCooldown) return message.channel.send(`You already claimed your daily ccoins. Come back after ${add.time.days} days, ${add.time.hours} hours, ${add.time.minutes} minutes & ${add.time.seconds} seconds.💸`);
+        else return message.channel.send(`💸you claimed ${add.amount} as your daily CCoins and now you have total ${add.after} CCoins.💸`);
+    };
 
+    if(command === "weekly") {
+        let add = eco.weekly(message.author.id, 5000);
+        if (add.onCooldown) return message.channel.send(`you already fucking claimed wait ${add.time.days} days`);
+        else return message.channel.send(`💸you claimed you fucking weekly ${add.amount} CCoins and you have fucking total ${add.after} CCoins💸`);
+    };
 
+    if(command === "balance") {
+        let money = eco.fetchMoney(message.author.id);
+        return message.channel.send(`${money.user.toString()} has ${money.amount} CCoins.`);
+    };
+
+    if(command === "bal") {
+        let money = eco.fetchMoney(message.author.id);
+        return message.channel.send(`${money.user.toString()} has ${money.amount} CCoins.`);
+    };
+
+    if(command == "leaderboard") {
+        let lb = eco.leaderboard({ limit: 10, raw: false });
+        const lbemb = new Discord.MessageEmbed()
+        .setAuthor("Cloins Leaderboard")
+        .setTitle("💸Top of 10 users who has the most CCoins💸")
+        .setThumbnail(message.guild.iconURL)
+        .setFooter('Cluckie Leaderboard');
+        lb.forEach(u => {
+            lbemb.addField(`${u.position}. ${client.users.get(u.id).tag}`, `Money: ${u.money} 💸`);
+        });
+        message.channel.send(lbemb)
+    };
+
+    if(command === "work") {
+        let bal = eco.fetchMoney(message.author.id);
+        let work = eco.work(message.author.id, message.guild.id, [Math.floor(Math.random() * 1001)], options={ jobs: ["workJobOp"], cooldown: 2.7e+6 });
+        const workemb = new Discord.MessageEmbed()
+        .setTitle('Work')
+        .setDescription(`${message.author} has worked as a ${eco.work.workedAs} and made ${work.amount}, You now has ${bal.amount} CCoins. You can work at ${work.time.minutes} minutes!`)
+        .setFooter('Making a work command is hard');
+        if (work.onCooldown) return message.channel.send(`You already worked once. Come back after ${work.time.minutes} minutes and ${work.time.seconds} seconds.`);
+        else return message.channel.send(workemb);
+    };
+
+    if(command === "beg") {
+        const begv = [
+            "0",
+            "5",
+            "100",
+            "100",
+            "2",
+            "25",
+            "50",
+            "75",
+            "30"
+        ];
+        let beg = eco.beg(message.author.id, message.guild.id, [Math.floor(Math.random() * begv.length)], options = { canLose: true, cooldown: 60000, customName: "beg" });
+        if (beg.onCooldown) return message.channel.send(`Begga you begged again stop beggain and wait ${beg.time.minutes} minutes and ${beg.time.seconds} seconds begga`);
+        else return message.channel.send(`You begged ${beg.amount} CCoins and you need to wait some time to beg again begga and begga you has ${beg.after} CCoins`);
+
+    };
 
 
 
